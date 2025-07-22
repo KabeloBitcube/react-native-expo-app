@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 export default function LoginScreen() {
     return (
         <View style={styles.view}>
-            <Text>Login screen.</Text>
+            <Text>Logged In</Text>
         </View>
     );
 }
