@@ -11,30 +11,19 @@ type AuthContextType = {
 
 const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider ({children}: {children: React.ReactNode}) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<Models.User<Models.Preferences> | null>(null);
     const getUser = async () => {
-        try{
+        try {
             const userData = await account.get();
             setUser(userData);
         } catch (error) {
-            console.error("Error fetching user:", error);
             setUser(null);
         }
     }
-
     useEffect(() => {
-        const fetchUserIfSession = async () => {
-            try {
-                const userData = await account.get();
-                setUser(userData);
-            } catch (error) {
-                setUser(null);
-            }
-        };
-        fetchUserIfSession();
+        getUser();
     }, []);
-    
 
     const signUp = async (email: string, password: string) => {
         try {
@@ -43,16 +32,18 @@ export function AuthProvider ({children}: {children: React.ReactNode}) {
             return null;
         } catch (error) {
             console.error("Sign Up Error:", error);
-            throw error; 
+            throw error;
         }
     }
+
     const signIn = async (email: string, password: string) => {
         try {
-            const session = await account.createEmailPasswordSession(email, password);
+            await account.createEmailPasswordSession(email, password);
+            await getUser();
             return null;
         } catch (error) {
             console.error("Sign In Error:", error);
-            throw error; 
+            return "Sign In failed. Please check your credentials.";
         }
     }
     const signOut = async () => {
@@ -64,9 +55,9 @@ export function AuthProvider ({children}: {children: React.ReactNode}) {
         }
     }
 
-    return <AuthContext.Provider value={{user, signUp, signIn, signOut}}>
-            {children}
-        </AuthContext.Provider>;
+    return <AuthContext.Provider value={{ user, signUp, signIn, signOut }}>
+        {children}
+    </AuthContext.Provider>;
 }
 
 export function useAuth() {
