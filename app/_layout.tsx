@@ -2,22 +2,29 @@ import { AuthProvider, useAuth } from "@/lib/auth_context";
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
+import { PaperProvider } from "react-native-paper";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 function AppStack() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-      setLoading(false);
+      if (user) {
+          console.log("User is authenticated:", user);
+          setLoading(false);
+      } else {
+          console.log("No user authenticated");
+      }
   }, [user]);
 
-  if (loading) {
+  if (!user && loading) {
     return <LoadingComponent />; 
   }
 
   return (
     <Stack>
-      {!user ? (
+      {user === null ? (
         <Stack.Screen name="auth" options={{ title: "Authentication" }} />
       ) : (
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -37,7 +44,11 @@ export function LoadingComponent() {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <AppStack />
+      <PaperProvider>
+        <SafeAreaProvider>
+          <AppStack />
+        </SafeAreaProvider>
+      </PaperProvider>
     </AuthProvider>
   );
 }

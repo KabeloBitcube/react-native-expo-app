@@ -21,9 +21,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser(null);
         }
     }
-    useEffect(() => {
-        getUser();
-    }, []);
+
+    useEffect(() => {getUser()}, []);
 
     const signUp = async (email: string, password: string) => {
         try {
@@ -46,6 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             return "Sign In failed. Please check your credentials.";
         }
     }
+    
     const signOut = async () => {
         try {
             await account.deleteSession("current");
