@@ -10,9 +10,6 @@ export default function TabsLayout() {
             <Ionicons name="home" color={color} size={size} />
           ),
         }} />
-      <Tabs.Screen name="login" options={{ title: "Login", tabBarIcon: ({ color, size }) => (
-            <Ionicons name="log-in-outline" color={color} size={size} />
-          ), }} />
     </Tabs>
   );
 }
