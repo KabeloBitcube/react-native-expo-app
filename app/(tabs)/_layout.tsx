@@ -5,7 +5,7 @@ export default function TabsLayout() {
   return (
     <Tabs screenOptions={{tabBarActiveBackgroundColor: "lightgrey"}}>
       <Tabs.Screen name="index" options={{
-          title: "Today's Habits",
+          title: "Habits",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar-outline" color={color} size={size} />
           ),

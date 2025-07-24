@@ -6,7 +6,7 @@ import { StyleSheet, View } from "react-native";
 import { ID } from "react-native-appwrite";
 import { Button, SegmentedButtons, Text, TextInput, useTheme } from "react-native-paper";
 
-const FREQUENCY_OPTIONS = ["daily", "weekly", "monthly"];
+const FREQUENCY_OPTIONS = ["Daily", "Weekly", "Monthly"];
 type Frequency = (typeof FREQUENCY_OPTIONS)[number];
 
 export default function AddHabit() {
@@ -35,7 +35,7 @@ export default function AddHabit() {
                     created_at: new Date().toISOString(),
                 }
             );
-            router.back();
+            router.replace('/');
         } catch (error) {
             setError(error instanceof Error ? error.message : "Failed to add habit");
         }
@@ -62,7 +62,12 @@ export default function AddHabit() {
 
 
 const styles = StyleSheet.create({
-    view: {
-        padding: 20,
-    },
+  view: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: "#fff",
+    elevation: 1,
+    borderRadius: 8,
+    margin: 16,
+  },
 });
