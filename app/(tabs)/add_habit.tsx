@@ -12,7 +12,7 @@ type Frequency = (typeof FREQUENCY_OPTIONS)[number];
 export default function AddHabit() {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [frequency, setFrequency] = useState<Frequency>("daily");
+    const [frequency, setFrequency] = useState<Frequency>("Daily");
     const [error, setError] = useState<string | null>(null);
     const theme = useTheme();
     const { user } = useAuth();
@@ -33,6 +33,7 @@ export default function AddHabit() {
                     streak_count: 0,
                     last_completed: new Date().toISOString(),
                     created_at: new Date().toISOString(),
+                    complete: false,
                 }
             );
             router.replace('/');

@@ -8,4 +8,5 @@ export interface Habit extends Models.Document {
     streak_count: number;
     last_completed: string; 
     created_at: string;
+    completed: boolean;
 }

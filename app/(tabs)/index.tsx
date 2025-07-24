@@ -5,7 +5,7 @@ import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { Modal, ScrollView, StyleSheet, View } from "react-native";
 import { Query } from "react-native-appwrite";
-import { Button, Divider, IconButton, SegmentedButtons, Text, TextInput } from "react-native-paper";
+import { Badge, Button, Divider, IconButton, SegmentedButtons, Text, TextInput, useTheme } from "react-native-paper";
 
 export default function Index() {
   const { signOut, user } = useAuth();
@@ -14,6 +14,11 @@ export default function Index() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [frequency, setFrequency] = useState<Frequency>("daily");
+  const [isComplete, setIsComplete] = useState(false);
+
+  const theme = useTheme();
+
+
   const FREQUENCY_OPTIONS = ["Daily", "Weekly", "Monthly"];
   type Frequency = (typeof FREQUENCY_OPTIONS)[number];
 
@@ -62,6 +67,7 @@ export default function Index() {
           title: title || habit.title,
           description: description || habit.description,
           frequency: frequency || habit.frequency,
+          complete: isComplete || habit.complete,
           user_id: user?.$id
         });
       console.log("Habit updated:", habitId);
@@ -85,13 +91,14 @@ export default function Index() {
         {habits?.length === 0 ? (
           <Text variant="bodyMedium" style={{ padding: 50 }}>No habits found. Start by creating one!</Text>
         ) : (habits?.map((habit) => (
-          <View key={habit.$id} style={{backgroundColor: "#e3dce7ff", padding: 16, borderRadius: 8,}}>
+          <View key={habit.$id} style={{backgroundColor: "#e3dce7ff", padding: 16, borderRadius: 8, marginBottom: 16 }}>
             <ScrollView showsVerticalScrollIndicator={false}>
               <Text variant="titleMedium">{habit.title}</Text>
               <Text variant="bodyMedium">{habit.description}</Text>
               <Text variant="bodySmall">{habit.frequency}</Text>
               {/* <Text variant="bodySmall">Streak: {habit.streak_count}</Text> */}
               {/* <Text variant="bodySmall">Last Completed: {habit.last_completed}</Text> */}
+              <Badge style={{backgroundColor: isComplete ? "orange" : "green", fontWeight:"bold"}}>{isComplete ? "Incomplete" : "Complete"}</Badge>
               <Divider style={styles.divider}></Divider>
               <View style={{ flexDirection: "row", justifyContent: "flex-end", alignItems: "center" }}>
                 <IconButton size={20} icon="delete-outline" onPress={() => handleDeleteHabit(habit.$id)}></IconButton>
@@ -113,7 +120,10 @@ export default function Index() {
                         value: frequency,
                         label: frequency.charAt(0).toUpperCase() + frequency.slice(1),
                       }))} />
-                    <Button mode="contained" onPress={() => handleUpdateHabit(habit.$id)}>Save</Button>
+                      <Button icon={isComplete ? "tray-remove" : "checkbox-marked-circle-outline"} mode="contained-tonal" onPress={() => setIsComplete(!isComplete)} style={{ marginBottom: 20, backgroundColor: theme.colors.background }}>
+                        {isComplete ? "Mark as Incomplete" : "Mark as Complete"}
+                      </Button>
+                      <Button mode="contained" onPress={() => handleUpdateHabit(habit.$id)}>Save</Button>
                   </ScrollView>
                 </View>
               </Modal>
