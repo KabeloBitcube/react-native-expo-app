@@ -24,7 +24,7 @@ function AppStack() {
 
   return (
     <Stack>
-      {user === null ? (
+      {!user ? (
         <Stack.Screen name="auth" options={{ title: "Authentication" }} />
       ) : (
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
