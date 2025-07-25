@@ -3,9 +3,9 @@ import { useAuth } from "@/lib/auth_context";
 import { Habit } from "@/types/databases.type";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
-import { Modal, ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { Query } from "react-native-appwrite";
-import { Badge, Button, Divider, IconButton, SegmentedButtons, Text, TextInput, useTheme } from "react-native-paper";
+import { Badge, Button, Divider, IconButton, Modal, PaperProvider, Portal, SegmentedButtons, Text, TextInput, useTheme } from "react-native-paper";
 
 export default function Index() {
   const { signOut, user } = useAuth();
@@ -50,7 +50,7 @@ export default function Index() {
     try {
       await database.deleteDocument(DATABASE_ID, HABITS_COLLECTION_ID, habitId);
       console.log("Habit deleted:", habitId);
-      fetchHabits(); 
+      fetchHabits();
     } catch (error) {
       console.error("Error deleting habit:", error);
     }
@@ -62,7 +62,7 @@ export default function Index() {
       const habit = habits?.find(h => h.$id === habitId);
       if (!habit) return;
 
-      await database.updateDocument(DATABASE_ID, HABITS_COLLECTION_ID, habitId, 
+      await database.updateDocument(DATABASE_ID, HABITS_COLLECTION_ID, habitId,
         {
           title: title || habit.title,
           description: description || habit.description,
@@ -71,13 +71,14 @@ export default function Index() {
           user_id: user?.$id
         });
       console.log("Habit updated:", habitId);
-      fetchHabits(); 
+      fetchHabits();
     } catch (error) {
       console.log(error);
     }
   }
 
   return (
+    <PaperProvider>
     <View style={styles.view}>
       <View style={{ backgroundColor: "#f5f5f5", padding: 16, borderRadius: 8, marginBottom: 16 }}>
         <Button icon="account-arrow-left" onPress={async () => {
@@ -91,48 +92,55 @@ export default function Index() {
         {habits?.length === 0 ? (
           <Text variant="bodyMedium" style={{ padding: 50 }}>No habits found. Start by creating one!</Text>
         ) : (habits?.map((habit) => (
-          <View key={habit.$id} style={{backgroundColor: "#e3dce7ff", padding: 16, borderRadius: 8, marginBottom: 16 }}>
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <Text variant="titleMedium">{habit.title}</Text>
-              <Text variant="bodyMedium">{habit.description}</Text>
-              <Text variant="bodySmall">{habit.frequency}</Text>
-              {/* <Text variant="bodySmall">Streak: {habit.streak_count}</Text> */}
-              {/* <Text variant="bodySmall">Last Completed: {habit.last_completed}</Text> */}
-              <Badge style={{backgroundColor: isComplete ? "darkorange" : "green", fontWeight:"bold", fontSize:15}}>{isComplete ? "Incomplete" : "Complete"}</Badge>
-              <Divider style={styles.divider}></Divider>
-              <View style={{ flexDirection: "row", justifyContent: "flex-end", alignItems: "center" }}>
-                <IconButton size={20} icon="delete-outline" onPress={() => handleDeleteHabit(habit.$id)}></IconButton>
-                <IconButton size={20} icon="square-edit-outline" onPress={()=> setIsModalVisible(true)}></IconButton>
-              </View>
-              <Modal
-                visible={isModalVisible}
-                onRequestClose={() => setIsModalVisible(false)}
-                animationType="slide"
-              >
-                <View style={styles.editview}>
-                  <ScrollView>
-                    <Text variant="titleLarge">Update Habit</Text>
-                    <TextInput label="Title" mode="outlined" onChangeText={setTitle} />
-                    <TextInput label="Description" mode="outlined" multiline numberOfLines={4} style={{ marginBottom: 10 }} onChangeText={setDescription} />
-                    <SegmentedButtons style={{ marginBottom: 20 }}
-                      value={frequency} onValueChange={(value) => setFrequency(value as Frequency)}
-                      buttons={FREQUENCY_OPTIONS.map((frequency) => ({
-                        value: frequency,
-                        label: frequency.charAt(0).toUpperCase() + frequency.slice(1),
-                      }))} />
-                      <Button icon={isComplete ? "tray-remove" : "checkbox-marked-circle-outline"} mode="contained-tonal" onPress={() => setIsComplete(!isComplete)} style={{ marginBottom: 20, backgroundColor: theme.colors.background }}>
-                        {isComplete ? "Mark as Incomplete" : "Mark as Complete"}
-                      </Button>
-                      <Button mode="contained" onPress={() => handleUpdateHabit(habit.$id)}>Save</Button>
-                  </ScrollView>
+          <View key={habit.$id} style={{ backgroundColor: "#e3dce7ff", padding: 16, borderRadius: 8, marginBottom: 16 }}>
+            
+              <ScrollView showsVerticalScrollIndicator={false}>
+                
+                <Text variant="titleMedium">{habit.title}</Text>
+                <Text variant="bodyMedium">{habit.description}</Text>
+                <Text variant="bodySmall">{habit.frequency}</Text>
+                {/* <Text variant="bodySmall">Streak: {habit.streak_count}</Text> */}
+                {/* <Text variant="bodySmall">Last Completed: {habit.last_completed}</Text> */}
+                <Badge style={{ backgroundColor: isComplete ? "darkorange" : "green", fontWeight: "bold", fontSize: 15 }}>{isComplete ? "Incomplete" : "Complete"}</Badge>
+                <Divider style={styles.divider}></Divider>
+                <View style={{ flexDirection: "row", justifyContent: "flex-end", alignItems: "center" }}>
+                  <IconButton size={20} icon="delete-outline" onPress={() => handleDeleteHabit(habit.$id)}></IconButton>
+                  <IconButton size={20} icon="square-edit-outline" onPress={() => setIsModalVisible(true)}></IconButton>
                 </View>
-              </Modal>
-            </ScrollView>
+                <Portal>
+                  <Modal
+                    visible={isModalVisible}
+                    contentContainerStyle={{ backgroundColor: "white", padding: 20, margin: 20, borderRadius: 8, minHeight: 500 }}
+                    dismissable={true}
+                    onDismiss={() => setIsModalVisible(false)}
+                  >
+                    <View style={styles.editview}>
+                      <ScrollView>
+                        <Text variant="titleLarge">Update Habit</Text>
+                        <TextInput label="Title" mode="outlined" onChangeText={setTitle} />
+                        <TextInput label="Description" mode="outlined" multiline numberOfLines={4} style={{ marginBottom: 10 }} onChangeText={setDescription} />
+                        <SegmentedButtons style={{ marginBottom: 20 }}
+                          value={frequency} onValueChange={(value) => setFrequency(value as Frequency)}
+                          buttons={FREQUENCY_OPTIONS.map((frequency) => ({
+                            value: frequency,
+                            label: frequency.charAt(0).toUpperCase() + frequency.slice(1),
+                          }))} />
+                        <Button icon={isComplete ? "tray-remove" : "checkbox-marked-circle-outline"} mode="contained-tonal" onPress={() => setIsComplete(!isComplete)} style={{ marginBottom: 20, backgroundColor: theme.colors.background }}>
+                          {isComplete ? "Mark as Incomplete" : "Mark as Complete"}
+                        </Button>
+                        <Button mode="contained" onPress={() => handleUpdateHabit(habit.$id)}>Save</Button>
+                      </ScrollView>
+                    </View>
+                  </Modal>
+                </Portal>
+              </ScrollView>
+            
           </View>
         ))
         )}
       </View>
     </View>
+    </PaperProvider>
   );
 }
 
