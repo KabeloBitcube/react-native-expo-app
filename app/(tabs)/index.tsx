@@ -98,7 +98,7 @@ export default function Index() {
               <Text variant="bodySmall">{habit.frequency}</Text>
               {/* <Text variant="bodySmall">Streak: {habit.streak_count}</Text> */}
               {/* <Text variant="bodySmall">Last Completed: {habit.last_completed}</Text> */}
-              <Badge style={{backgroundColor: isComplete ? "orange" : "green", fontWeight:"bold"}}>{isComplete ? "Incomplete" : "Complete"}</Badge>
+              <Badge style={{backgroundColor: isComplete ? "darkorange" : "green", fontWeight:"bold", fontSize:15}}>{isComplete ? "Incomplete" : "Complete"}</Badge>
               <Divider style={styles.divider}></Divider>
               <View style={{ flexDirection: "row", justifyContent: "flex-end", alignItems: "center" }}>
                 <IconButton size={20} icon="delete-outline" onPress={() => handleDeleteHabit(habit.$id)}></IconButton>
